@@ -1,19 +1,21 @@
 <template>
   <div class="user-info">
-    <h2 class="user-info__title">
-      Player: {{ name }}
-    </h2>
-    <p class="user-info__score">
-      Score: {{ score }}
-    </p>
+    <h2 class="user-info__title">Player: {{ name }}</h2>
+    <div
+      class="user-info__activity"
+      :class="{ 'user-info__activity--active': isActive }"
+    >
+      Current turn
+    </div>
+    <p class="user-info__score">Score: {{ score }}</p>
     <div class="user-info__table">
       <div
         v-for="(item, index) in score"
         :key="index"
         class="user-info__figure"
         :class="{
-          'user-info__figure--black': name === 'Black',
-          'user-info__figure--white': name === 'White',
+          'user-info__figure--black': name !== 'Black',
+          'user-info__figure--white': name !== 'White',
         }"
       ></div>
     </div>
@@ -49,6 +51,20 @@ const score = computed(() => props.user.score || 0);
     text-align: right;
     .user-info__table {
       flex-direction: row-reverse;
+    }
+  }
+  &__activity {
+    margin: 0 0 15px;
+    padding: 5px 15px;
+    
+    border-radius: 5px;
+    background-color: @green;
+    color: @black;
+    font-size: 16px;
+    font-weight: 700;
+    visibility: hidden;
+    &--active {
+      visibility: visible;
     }
   }
   &__table {

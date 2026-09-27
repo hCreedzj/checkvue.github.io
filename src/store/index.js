@@ -25,6 +25,8 @@ export const useMainStore = defineStore("main", () => {
 
   const currentChecker = ref(null);
 
+  const currentPlayer = ref(1);
+
   function resetCurrentChecker() {
     currentChecker.value = null;
   }
@@ -42,11 +44,17 @@ export const useMainStore = defineStore("main", () => {
     ];
   }
 
+  function changePlayer() {
+    currentPlayer.value = currentPlayer.value === 1 ? 2 : 1;
+  };
+
   return {
     table,
     tableHighlight,
     currentChecker,
     resetCurrentChecker,
     resetTableHighlight,
+    currentPlayer,
+    changePlayer,
   };
 });

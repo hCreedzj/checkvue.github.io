@@ -26,13 +26,17 @@ import { storeToRefs } from "pinia";
 
 import TableCell from "@/components/TableCell.vue";
 import { useMainStore } from "@/store";
+import { useUserStore } from "@/store/user";
 
+const { userBlack, userWhite } = storeToRefs(useUserStore());
 const store = useMainStore();
 
-const { table, tableHighlight, currentChecker } = storeToRefs(store);
+const { table, tableHighlight, currentChecker, currentPlayer } = storeToRefs(store);
 
 function showWay(data) {
   const { ways, current } = data;
+
+  if (currentPlayer.value !== current.figureType) return;
 
   const tempArr = [
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -67,6 +71,7 @@ function moveChecker(current) {
     });
     store.resetTableHighlight();
     store.resetCurrentChecker();
+    store.changePlayer();
   }
 }
 
@@ -104,7 +109,12 @@ function takeEnemy(cell) {
   ) {
     store.$patch((state) => {
       state.table[enemy.cy][enemy.cx] = 0;
-    })
+    });
+    if (figureType === 1) {
+      userWhite.value.increaseScore();
+    } else {
+      userBlack.value.increaseScore();
+    }
   }
 }
 </script>

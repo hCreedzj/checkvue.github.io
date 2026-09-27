@@ -4,11 +4,11 @@
       v-if="figureType !== 0"
       class="table-cell__figure"
       :class="{
-        'table-cell__figure--black': figureType === 1,
-        'table-cell__figure--white': figureType === 2,
+        'table-cell__figure--black': figureType === 2,
+        'table-cell__figure--white': figureType === 1,
+        'table-cell__figure--active': isActive,
       }"
       @click.stop="showWay"
-      
     ></div>
   </div>
 </template>
@@ -16,10 +16,11 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useMainStore } from "@/store";
+import { computed } from 'vue';
 
 const store = useMainStore();
 
-const { table } = storeToRefs(store);
+const { table, currentChecker } = storeToRefs(store);
 
 import { defineProps, ref, reactive } from "vue";
 
@@ -42,6 +43,13 @@ const current = reactive({
   cy: cy.value,
   figureType: figureType.value,
 });
+
+const isActive = computed(
+  () =>
+    currentChecker.value &&
+    currentChecker.value.cx === current.cx &&
+    currentChecker.value.cy === current.cy,
+);
 
 function moveCalculate(ways) {
   const availableWays = {
@@ -103,21 +111,21 @@ function showWay() {
       cy: cy.value + 1,
     },
   ].filter((item) => onTable(item));
-  ways = moveCalculate(ways).filter(item => canMove(item));
+  ways = moveCalculate(ways).filter((item) => canMove(item));
   emit("showWay", { ways, current });
 }
 
 function editWay(way) {
   const { cx, cy, position } = way;
   const options = {
-    topLeft: (x, y) => ({cx: x - 1, cy: y - 1}),
-    topRight: (x, y) => ({cx: x + 1, cy: y - 1}),
-    bottomLeft: (x, y) => ({cx: x - 1, cy: y + 1}),
-    bottomRight: (x, y) => ({cx: x + 1, cy: y + 1}),
+    topLeft: (x, y) => ({ cx: x - 1, cy: y - 1 }),
+    topRight: (x, y) => ({ cx: x + 1, cy: y - 1 }),
+    bottomLeft: (x, y) => ({ cx: x - 1, cy: y + 1 }),
+    bottomRight: (x, y) => ({ cx: x + 1, cy: y + 1 }),
   };
 
-  return Object.assign({position}, options[position](cx, cy));
-};
+  return Object.assign({ position }, options[position](cx, cy));
+}
 
 function moveChecker() {
   emit("moveChecker", current);
@@ -143,10 +151,16 @@ function moveChecker() {
 
     &--black {
       background-color: @black;
+      &.table-cell__figure--active {
+        box-shadow: 0 0 4px 2px @black;
+      }
     }
 
     &--white {
       background-color: @white;
+      &.table-cell__figure--active {
+        box-shadow: 0 0 4px 2px @white;
+      }
     }
   }
 }
