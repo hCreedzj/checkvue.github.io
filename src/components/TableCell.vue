@@ -1,5 +1,5 @@
 <template>
-  <div class="table-cell">
+  <div class="table-cell" @click="moveChecker">
     <div
       v-if="figureType !== 0"
       class="table-cell__figure"
@@ -7,15 +7,23 @@
         'table-cell__figure--black': figureType === 1,
         'table-cell__figure--white': figureType === 2,
       }"
-      @click="showWay"
+      @click.stop="showWay"
+      
     ></div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useMainStore } from "@/store";
 
-const emit = defineEmits(["showWay"]);
+const store = useMainStore();
+
+const { table } = storeToRefs(store);
+
+import { defineProps, ref, reactive } from "vue";
+
+const emit = defineEmits(["showWay", "moveChecker"]);
 
 const props = defineProps({
   data: {
@@ -28,6 +36,34 @@ const figureType = ref(props.data.figureType);
 
 const cx = ref(props.data.cx);
 const cy = ref(props.data.cy);
+
+const current = reactive({
+  cx: cx.value,
+  cy: cy.value,
+  figureType: figureType.value,
+});
+
+function moveCalculate(ways) {
+  const availableWays = {
+    1: ["topLeft", "topRight"],
+    2: ["bottomLeft", "bottomRight"],
+  };
+
+  const temp = [];
+  ways.forEach((way) => {
+    const { cx, cy, position } = way;
+
+    const tableCell = table.value[cy][cx];
+
+    const canMove = availableWays[figureType.value].includes(position);
+
+    if (tableCell === 0 && !canMove) return;
+    if (tableCell === 0 && canMove) {
+      return temp.push(way);
+    }
+  });
+  return temp;
+}
 
 function onTable(way) {
   const { cx, cy } = way;
@@ -58,7 +94,12 @@ function showWay() {
       cy: cy.value + 1,
     },
   ].filter((item) => onTable(item));
-  emit("showWay", { ways });
+  ways = moveCalculate(ways);
+  emit("showWay", { ways, current });
+}
+
+function moveChecker() {
+  emit("moveChecker", current);
 }
 </script>
 

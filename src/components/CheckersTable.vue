@@ -12,6 +12,7 @@
         :key="rowIndex + '-' + cellIndex + cell"
         :data="{ figureType: cell, cx: cellIndex, cy: rowIndex }"
         @showWay="showWay"
+        @moveChecker="moveChecker"
       />
     </div>
   </div>
@@ -25,10 +26,10 @@ import { useMainStore } from "@/store";
 
 const store = useMainStore();
 
-const { table, tableHighlight } = storeToRefs(store);
+const { table, tableHighlight, currentChecker } = storeToRefs(store);
 
 function showWay(data) {
-  const { ways } = data;
+  const { ways, current } = data;
 
   const tempArr = [
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -47,8 +48,25 @@ function showWay(data) {
 
   store.$patch({
     tableHighlight: tempArr,
+    currentChecker: current,
   })
 }
+function moveChecker(current) {
+  const { cx, cy } = current;
+
+   if (tableHighlight.value[cy][cx] !== 1) return;
+
+  if (tableHighlight.value[cy][cx] === 1 ) {
+    store.$patch((state) => {
+      state.table[currentChecker.value.cy][currentChecker.value.cx] = 0;
+      state.table[cy][cx] = currentChecker.value.figureType;
+
+    });
+    store.resetTableHighlight();
+    store.resetCurrentChecker();
+
+  };
+};
 </script>
 
 

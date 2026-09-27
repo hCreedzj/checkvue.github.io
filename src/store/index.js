@@ -22,6 +22,31 @@ export const useMainStore = defineStore("main", () => {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
-  
-  return { table, tableHighlight };
+
+  const currentChecker = ref(null);
+
+  function resetCurrentChecker() {
+    currentChecker.value = null;
+  }
+
+  function resetTableHighlight() {
+    tableHighlight.value = [
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+    ];
+  }
+
+  return {
+    table,
+    tableHighlight,
+    currentChecker,
+    resetCurrentChecker,
+    resetTableHighlight,
+  };
 });
