@@ -61,6 +61,10 @@ function moveCalculate(ways) {
     if (tableCell === 0 && canMove) {
       return temp.push(way);
     }
+
+    if (tableCell !== figureType.value) {
+      return temp.push(editWay(way));
+    }
   });
   return temp;
 }
@@ -69,6 +73,11 @@ function onTable(way) {
   const { cx, cy } = way;
 
   return cx >= 0 && cx < 8 && cy >= 0 && cy < 8;
+}
+
+function canMove(way) {
+  const { cx, cy } = way;
+  return onTable(way) && table.value[cy][cx] === 0;
 }
 
 function showWay() {
@@ -94,9 +103,21 @@ function showWay() {
       cy: cy.value + 1,
     },
   ].filter((item) => onTable(item));
-  ways = moveCalculate(ways);
+  ways = moveCalculate(ways).filter(item => canMove(item));
   emit("showWay", { ways, current });
 }
+
+function editWay(way) {
+  const { cx, cy, position } = way;
+  const options = {
+    topLeft: (x, y) => ({cx: x - 1, cy: y - 1}),
+    topRight: (x, y) => ({cx: x + 1, cy: y - 1}),
+    bottomLeft: (x, y) => ({cx: x - 1, cy: y + 1}),
+    bottomRight: (x, y) => ({cx: x + 1, cy: y + 1}),
+  };
+
+  return Object.assign({position}, options[position](cx, cy));
+};
 
 function moveChecker() {
   emit("moveChecker", current);
